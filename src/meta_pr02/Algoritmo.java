@@ -110,8 +110,7 @@ public abstract class Algoritmo {
         }
 
         return coste_actual + costeMayor-costeMenor;
-        
-        
+
     }
     
     /**
