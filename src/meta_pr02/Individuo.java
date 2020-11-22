@@ -15,18 +15,39 @@ import javafx.util.Pair;
  */
 public final class Individuo {
     
-    protected float[][] matrizDatos; //Matriz de datos con la que trabajará el individuo.
+    private final float[][] matrizDatos; //Matriz de datos con la que trabajará el individuo.
     
-    private Random random; //1 Random para cada individuo, para evitar que se creen todos los individuos a partir del mismo random.
-    private int num_elementos; //Tamaño completo de elementos que pueden ser o no parte de la Solución.
-    private int num_candidatos; //Tamaño que debe de ocupar el conjunto de elementos de la solución.
+    
+    private final int num_elementos; //Tamaño completo de elementos que pueden ser o no parte de la Solución.
+    private final int num_candidatos; //Tamaño que debe de ocupar el conjunto de elementos de la solución.
     private HashSet<Integer> cromosoma; //Contenedor de la solución de 1 individuo.
     private HashSet<Integer> N; //Contenedor de los elementos no pertenecientes al cromosoma.
     private double fitness; //Coste asociado al cromosoma.
     
-    public Individuo(Long sem, float[][] _matrizDatos){ /*TODO: EN POBLACIÓN VINCULARLA CON CONFIGURADOR PARA COGER LA SEM DESDE EL CONFIG.TXT*/
+    public Individuo(ArchivoDatos _archivo,ArrayList<Integer> _cromosoma){
+        matrizDatos = _archivo.getMatrizDatos();
+        num_elementos = _archivo.getTamMatriz();
+        num_candidatos = _archivo.getTamSolucion();
         
-        matrizDatos = _matrizDatos;
+        /*INICIALIZACION DE TODOS LOS ELEMENTOS*/
+        N = new HashSet<>(num_elementos);
+        for (int i=0; i < num_elementos; i++)
+            N.add(i);
+
+        cromosoma = new HashSet<>();
+        for (int i = 0; i < _cromosoma.size(); i++){
+            cromosoma.add(_cromosoma.get(i));
+            N.remove(_cromosoma.get(i));
+        }
+        /*COSTE INICIAL DEL INDIVIDUO*/
+        fitness = costeFitness(cromosoma);
+    }
+    
+    public Individuo(Long sem,ArchivoDatos _archivo, Random random){
+        
+        matrizDatos = _archivo.getMatrizDatos();
+        num_elementos = _archivo.getTamMatriz();
+        num_candidatos = _archivo.getTamSolucion();
         
         /*INICIALIZACION DE TODOS LOS ELEMENTOS*/
         N = new HashSet<>(num_elementos);
@@ -35,7 +56,6 @@ public final class Individuo {
         
         /*INICIALIZACIÓN DEL CROMOSOMA.*/
         int punto;
-        random.Set_random(sem);
         
         cromosoma = new HashSet<>(num_candidatos);
         while (cromosoma.size() < num_candidatos){
@@ -46,7 +66,7 @@ public final class Individuo {
         
         /*COSTE INICIAL DEL INDIVIDUO*/
         fitness = costeFitness(cromosoma);
-        
+         
     }
     
     /**

@@ -15,14 +15,16 @@ import java.util.ArrayList;
  */
 public class Configurador {
     private ArrayList<String> archivos;
-    private ArrayList<String> algoritmos; //Para la elección de ejecución de los algoritmos a usar.
     private ArrayList<Long> semillas; //Para las diferentes semillas usadas.
     private Integer MAX_ITERACIONES;
     private Integer NUM_INDIVIDUOS;
+    private Integer NUM_ELITE_INDIVIDUOS;
+    private String TIPO_CRUCE;
+    private Float PROB_CRUCE;
+    private Float PROB_GEN_MUTE;
     
     public Configurador(String ruta){
         archivos = new ArrayList<>();
-        algoritmos = new ArrayList<>();
         semillas = new ArrayList<>();
         
         String linea;
@@ -38,13 +40,7 @@ public class Configurador {
                         for (int i = 0; i < vArchivos.length; i++)
                             archivos.add(vArchivos[i]);
                         break;
-                        
-                    case "Algoritmos":
-                        String[] vAlgoritmos = split[1].split(" "); //Volvemos a dividir por espacios.
-                        for (int i = 0; i < vAlgoritmos.length; i++)
-                            algoritmos.add(vAlgoritmos[i]);
-                        break;
-                        
+                      
                     case "Semillas":
                         String[] vSemillas = split[1].split(" "); //Volvemos a dividir por espacios.
                         for (int i = 0; i < vSemillas.length; i++)
@@ -57,7 +53,20 @@ public class Configurador {
                         
                     case "Num_Individuos":
                         NUM_INDIVIDUOS = Integer.parseInt(split[1]);
-
+                        break;
+                    case "Num_Elite_Individuos":
+                        NUM_ELITE_INDIVIDUOS = Integer.parseInt(split[1]);
+                        break;
+                    case "Tipo_Cruce":
+                        TIPO_CRUCE = split[1];
+                        break;
+                    case "Prob_Cruce":
+                        PROB_CRUCE = Float.parseFloat(split[1]);
+                        break;
+                    case "Prob_Gen_Mutacion":
+                        PROB_GEN_MUTE = Float.parseFloat(split[1]);
+                        break;
+                        
                     default:
                         break;
                     
@@ -80,13 +89,6 @@ public class Configurador {
     }
 
     /**
-     * @return the algoritmos
-     */
-    public ArrayList<String> getAlgoritmos() {
-        return algoritmos;
-    }
-
-    /**
      * @return the semillas
      */
     public ArrayList<Long> getSemillas() {
@@ -99,14 +101,7 @@ public class Configurador {
     public void setArchivos(ArrayList<String> archivos) {
         this.archivos = archivos;
     }
-
-    /**
-     * @param algoritmos the algoritmos to set
-     */
-    public void setAlgoritmos(ArrayList<String> algoritmos) {
-        this.algoritmos = algoritmos;
-    }
-
+    
     /**
      * @param semillas the semillas to set
      */
@@ -127,5 +122,33 @@ public class Configurador {
     public Integer getNUM_INDIVIDUOS() {
         return NUM_INDIVIDUOS;
     }
- 
+
+    /**
+     * @return the NUM_ELITE_INDIVIDUOS
+     */
+    public Integer getNUM_ELITE_INDIVIDUOS() {
+        return NUM_ELITE_INDIVIDUOS;
+    }
+
+    /**
+     * @return the TIPO_CRUCE
+     */
+    public String getTIPO_CRUCE() {
+        return TIPO_CRUCE;
+    }
+
+    /**
+     * @return the PROB_CRUCE
+     */
+    public Float getPROB_CRUCE() {
+        return PROB_CRUCE;
+    }
+
+    /**
+     * @return the PROB_GEN_MUTE
+     */
+    public Float getPROB_GEN_MUTE() {
+        return PROB_GEN_MUTE;
+    }
+    
 }
