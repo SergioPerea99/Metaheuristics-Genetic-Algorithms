@@ -19,9 +19,11 @@ public class AlgGenetico_Generacional {
     private final ArchivoDatos archivo;
     private final Random random;
     
+    
     private final int NUM_ELEMENTOS; //Tamaño completo de elementos que pueden ser o no parte de la Solución.
     private final int NUM_CANDIDATOS; //Tamaño que debe de ocupar el conjunto de elementos de la solución.
     private Poblacion poblacion;
+    private int evaluaciones;
     
     public AlgGenetico_Generacional(String[] _args,Integer num_archivo, Integer sem){
         config = new Configurador(_args[0]);
@@ -30,6 +32,7 @@ public class AlgGenetico_Generacional {
 
         NUM_ELEMENTOS = archivo.getTamMatriz();
         NUM_CANDIDATOS = archivo.getTamSolucion();
+        evaluaciones = 0;
         
         poblacion = new Poblacion(random,NUM_CANDIDATOS, archivo);//TODO: CREAR PARAMETRO CONFIGURABLE DEL NÚMERO DE INDIVIDUOS DE LA
     }
@@ -43,13 +46,13 @@ public class AlgGenetico_Generacional {
         /*PRUEBAS COMO SI FUESE UNA UNICA VEZ EL PROCESO.*/
         torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO.
         
-        nuevaPoblacion = cruce(nuevaPoblacion);
         
-        int ev = 0;
-        while (ev < config.getMAX_ITERACIONES()){
+        nuevaPoblacion = cruce(nuevaPoblacion);
+        System.out.println(evaluaciones);
+        while (evaluaciones < config.getMAX_ITERACIONES()){
 //            torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO.
 //            nuevaPoblacion = cruce(nuevaPoblacion);
-            ev++;
+            evaluaciones++;
         }
     }
         
@@ -94,9 +97,9 @@ public class AlgGenetico_Generacional {
     }
     
     private void cruce2puntos(Poblacion origen, Poblacion destinatario){
-        HashSet<Integer> hijo1, hijo2;
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){ //COMPRUEBO QUE ITERA O LA MITAD DE VECES DE UNA SOLUCIÓN O QUE ESTÉ COMPLETO EL DESTINATARIO
             if (random.Randfloat(0,1) < config.getPROB_CRUCE()){
+                HashSet<Integer> hijo1, hijo2;
                 hijo1 = new HashSet<>();
                 hijo2 = new HashSet<>();
                 int punto1, punto2;
@@ -134,7 +137,11 @@ public class AlgGenetico_Generacional {
                     repara2puntos(individuoHijo2);
                 
                 /*UNA VEZ TENEMOS LOS 2 INDIVIDUOS HIJOS CRUZADOS (Y REPARADOS EN CASO DE TENER QUE HACERLO) ENTONCES SE AÑADEN A LA POBLACIÓN*/
+                individuoHijo1.costeFitness();
+                evaluaciones++;
                 destinatario.getV_poblacion().add(individuoHijo1);
+                individuoHijo2.costeFitness();
+                evaluaciones++;
                 destinatario.getV_poblacion().add(individuoHijo2);
                 
             }
@@ -148,11 +155,6 @@ public class AlgGenetico_Generacional {
 //            System.out.println(destinatario.getV_poblacion().get(i).getCromosoma().size());
 //        System.out.println(destinatario.getV_poblacion().size());
     }
-    
-    private void cruceMPX(Poblacion origen, Poblacion destinatario){
-        
-    }
-    
     
     private void repara2puntos(Individuo ind){
         while(ind.getCromosoma().size() < archivo.getTamSolucion()){
@@ -170,8 +172,67 @@ public class AlgGenetico_Generacional {
         }
     }
     
-    private void reparaMPX (Individuo ind){
+    private void cruceMPX(Poblacion origen, Poblacion destinatario){
+        /*Se obtiene 1 hijo a partir de 2 padres*/
+        for(int i = 0; i < origen.getV_poblacion().size(); i += 2){
+            if (random.Randfloat(0,1) < config.getPROB_CRUCE()){
+                /*HAY QUE CRUZAR ENTONCES HAGO EL CRUCE 2 VECES PORQUE ES NECESARIO 2 RESULTADOS DE CRUCE*/
+                HashSet<Integer> hijo1 = new HashSet<>();
+                HashSet<Integer> hijo2 = new HashSet<>();
+                hijoMPX(origen.getV_poblacion().get(i),origen.getV_poblacion().get(i+1),hijo1);
+                hijoMPX(origen.getV_poblacion().get(i+1),origen.getV_poblacion().get(i),hijo2);
+                
+                
+                Individuo ind1 = new Individuo(archivo, new ArrayList<>(hijo1));
+                if (hijo1.size() > archivo.getTamSolucion())
+                    reparaMPX(ind1);
+                
+                
+                Individuo ind2 = new Individuo(archivo, new ArrayList<>(hijo2));
+                if (hijo2.size() > archivo.getTamSolucion())
+                    reparaMPX(ind2);
+
+                
+                /*UNA VEZ TENEMOS LOS 2 INDIVIDUOS HIJOS CRUZADOS (Y REPARADOS EN CASO DE TENER QUE HACERLO) ENTONCES SE AÑADEN A LA POBLACIÓN*/
+                ind1.costeFitness();
+                System.out.println(ind1.getCromosoma().size()+" --> "+ind1.getFitness());
+                evaluaciones++;
+                destinatario.getV_poblacion().add(ind1);
+                ind2.costeFitness();
+                System.out.println(ind2.getCromosoma().size()+" --> "+ind2.getFitness());
+                evaluaciones++;
+                destinatario.getV_poblacion().add(ind2);
+
+            }
+            else{
+                destinatario.getV_poblacion().add(origen.getV_poblacion().get(i));
+                destinatario.getV_poblacion().add(origen.getV_poblacion().get(i+1));
+            }
+        }
+    }
     
+    private void hijoMPX(Individuo i, Individuo j, HashSet<Integer> hijo){
+        ArrayList<Integer> padre1 = new ArrayList<>(i.getCromosoma());
+        ArrayList<Integer> padre2 = new ArrayList<>(j.getCromosoma());
+        for(int k = 0; k < padre2.size(); k++)
+            hijo.add(padre2.get(k));
+        int numPadre1 = (int)(padre1.size()*config.getPORCENTAJE_MPX());
+        int p1 = (int)(padre1.size()/2) - 1;
+        int p2 = (int)(padre1.size()/2);
+        while(numPadre1 > 0){
+            hijo.add(padre1.get(p1));
+            hijo.add(padre1.get(p2));
+            --p1; ++p2;
+            numPadre1 -= 2;
+        }  
+    }
+    
+    private void reparaMPX (Individuo ind){
+        ArrayList<Pair<Integer,Double>> v_aportes = new ArrayList<>();
+        ind.ordenacionMenorAporte(v_aportes);
+        int num_borrar = ind.getCromosoma().size() - archivo.getTamSolucion();
+        for(int i = 0; i < num_borrar; i++) /*Bucle de eliminar todos los sobrantes de menor aporte*/
+            ind.getCromosoma().remove(v_aportes.get(i).getKey());
     }
     
     /*---- MÉTODO DE MUTACIÓN ----*/

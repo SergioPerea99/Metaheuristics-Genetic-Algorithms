@@ -22,6 +22,7 @@ public class Configurador {
     private String TIPO_CRUCE;
     private Float PROB_CRUCE;
     private Float PROB_GEN_MUTE;
+    private Float PORCENTAJE_MPX;
     
     public Configurador(String ruta){
         archivos = new ArrayList<>();
@@ -66,7 +67,9 @@ public class Configurador {
                     case "Prob_Gen_Mutacion":
                         PROB_GEN_MUTE = Float.parseFloat(split[1]);
                         break;
-                        
+                    case "Porcentaje_MPX":
+                        PORCENTAJE_MPX = Float.parseFloat(split[1]);
+                        break;
                     default:
                         break;
                     
@@ -150,5 +153,14 @@ public class Configurador {
     public Float getPROB_GEN_MUTE() {
         return PROB_GEN_MUTE;
     }
+
+    /**
+     * @return the PORCENTAJE_MPX
+     */
+    public Float getPORCENTAJE_MPX() {
+        return PORCENTAJE_MPX;
+    }
+    
+    
     
 }

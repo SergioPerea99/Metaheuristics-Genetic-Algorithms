@@ -40,7 +40,7 @@ public final class Individuo {
             N.remove(_cromosoma.get(i));
         }
         /*COSTE INICIAL DEL INDIVIDUO*/
-        fitness = costeFitness(cromosoma);
+        fitness = costeFitness();
     }
     
     public Individuo(Long sem,ArchivoDatos _archivo, Random random){
@@ -65,7 +65,7 @@ public final class Individuo {
         }
         
         /*COSTE INICIAL DEL INDIVIDUO*/
-        fitness = costeFitness(cromosoma);
+        fitness = costeFitness();
          
     }
     
@@ -73,10 +73,9 @@ public final class Individuo {
      * 
      * @brief Sumatoria del coste final.
      * @post La suma de todas las distancias de cada uno de los puntos con respecto a los demás puntos.
-     * @param cromosoma Conjunto de elementos que representa a la solución.
      * @return Sumatoria final.
      */
-    public double costeFitness(HashSet<Integer> cromosoma){
+    public double costeFitness(){
         double coste = 0.0;
         ArrayList<Integer> v_M = new ArrayList<>(cromosoma);
         for(int i = 0; i < v_M.size()- 1; i++)
@@ -135,11 +134,10 @@ public final class Individuo {
      * @brief Ordenación respecto Aporte/Elemento.
      * @post Ordena el vector de aportes que representa cada elemento de la solución con respecto a los demás.
      * @param v_distancias Contenedor Pair que indica el elemento y su aporte correspondiente.
-     * @param solucion Conjunto de elementos que representa a la solución.
      */
-    protected void ordenacionMenorAporte(ArrayList<Pair<Integer,Double>> v_distancias, HashSet<Integer> solucion){
+    protected void ordenacionMenorAporte(ArrayList<Pair<Integer,Double>> v_distancias){
         v_distancias.clear();
-        ArrayList<Integer> v_solucion = new ArrayList<>(solucion);
+        ArrayList<Integer> v_solucion = new ArrayList<>(cromosoma);
         Pair<Integer,Double> añadir;
         for (int i = 0; i < v_solucion.size(); i++){
             añadir = new Pair<>(v_solucion.get(i),distanciasElemento(v_solucion.get(i)));
@@ -148,37 +146,6 @@ public final class Individuo {
        v_distancias.sort((o1,o2) -> o1.getValue().compareTo(o2.getValue()));
     }
     
-    /**
-     * @brief Método de factorización.
-     * @post Método de factorización que intercambia el valor entre 2 elementos seleccionados; es decir, una factorización 2-opt.
-     * @param seleccionado Elemento que se quiere eliminar de la solución.
-     * @param j Elemento que se quiere añadir en la solución.
-     * @param solucion Contiene el conjunto de elementos que forman una solución.
-     * @param coste_actual Coste de la solución.
-     * @param matrizDatos 
-     * @return Double que indica el nuevo valor de la solución una vez hecha la factorización con "seleccionado" y "j".
-     */
-    protected double factorizacion(int seleccionado,int j,HashSet<Integer> solucion, double coste_actual, float[][] matrizDatos){
-        ArrayList<Integer> v_M = new ArrayList<>(solucion);
-        double costeMenor = 0, costeMayor =0;
-        for (int k=0; k < v_M.size(); k++){
-            if (v_M.get(k)!= seleccionado){
-                if (matrizDatos[seleccionado][v_M.get(k)] != 0)
-                    costeMenor += matrizDatos[seleccionado][v_M.get(k)];
-                else
-                    costeMenor += matrizDatos[v_M.get(k)][seleccionado];
-            }
-            if (v_M.get(k)!= seleccionado){
-                if(matrizDatos[j][v_M.get(k)] != 0)
-                    costeMayor+= matrizDatos[j][v_M.get(k)];
-                else
-                    costeMayor+= matrizDatos[v_M.get(k)][j];
-            }
-        }
-
-        return coste_actual + costeMayor-costeMenor;
-
-    }
     
     /**
      * @return the num_elementos

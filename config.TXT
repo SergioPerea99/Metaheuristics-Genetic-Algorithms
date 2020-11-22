@@ -5,4 +5,5 @@ MaximoIteraciones=50000
 Num_Individuos=50
 Prob_Cruce=0.7
 Prob_Gen_Mutacion=0.05
-Tipo_Cruce=2puntos
+Tipo_Cruce=MPX
+Porcentaje_MPX=0.4
