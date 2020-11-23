@@ -44,15 +44,18 @@ public class AlgGenetico_Generacional {
         Poblacion nuevaPoblacion = new Poblacion(); //POBLACIÓN CON LA QUE REALIZAMOS EL PROCESO EVOLUTIVO.
         
         /*PRUEBAS COMO SI FUESE UNA UNICA VEZ EL PROCESO.*/
-        torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO.
-        
-        
-        nuevaPoblacion = cruce(nuevaPoblacion);
-        
        
-        nuevaPoblacion.mostrarPoblacion();
+       torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO
        
-        
+       Poblacion poblacion_cruzada = cruce(nuevaPoblacion);
+       //System.out.println(evaluaciones);
+       //poblacion_cruzada.mostrarPoblacion();
+       
+       Poblacion poblacion_mutada = mutacion(poblacion_cruzada);
+       //System.out.println(evaluaciones);
+       poblacion_mutada.mostrarPoblacion();
+       
+       
         while (evaluaciones < config.getMAX_ITERACIONES()){
 //            torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO.
 //            nuevaPoblacion = cruce(nuevaPoblacion);
@@ -174,7 +177,7 @@ public class AlgGenetico_Generacional {
         }
     }
     
-    /*NO FUNCIONA, DEVUELVE FITNESS POR INDIVIDUOS NO VÁLIDOS*/
+    /*APARENTEMENTE FUNCIONANDO*/
     private void cruceMPX(Poblacion origen, Poblacion destinatario){
         /*Se obtiene 1 hijo a partir de 2 padres*/
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){
@@ -198,11 +201,11 @@ public class AlgGenetico_Generacional {
                 
                 /*UNA VEZ TENEMOS LOS 2 INDIVIDUOS HIJOS CRUZADOS (Y REPARADOS EN CASO DE TENER QUE HACERLO) ENTONCES SE AÑADEN A LA POBLACIÓN*/
                 ind1.costeFitness();
-                System.out.println(ind1.getCromosoma().size()+" --> "+ind1.getFitness());
+                //System.out.println(ind1.getCromosoma().size()+" --> "+ind1.getFitness());
                 evaluaciones++;
                 destinatario.getV_poblacion().add(ind1);
                 ind2.costeFitness();
-                System.out.println(ind2.getCromosoma().size()+" --> "+ind2.getFitness());
+                //System.out.println(ind2.getCromosoma().size()+" --> "+ind2.getFitness());
                 evaluaciones++;
                 destinatario.getV_poblacion().add(ind2);
 
@@ -240,7 +243,39 @@ public class AlgGenetico_Generacional {
     
     /*---- MÉTODO DE MUTACIÓN ----*/
     
-    
+    /*APARENTEMENTE FUNCIONANDO*/
+    private Poblacion mutacion(Poblacion origen){
+        Poblacion destinatario = new Poblacion();
+        int cambiar;
+        boolean mutado = false;
+        for(int i = 0; i < origen.getV_poblacion().size() ; i++){ //RECORRO TODOS LOS INDIVIDUOS DE LA POBLACIÓN ORIGEN
+            ArrayList<Integer> cromosoma = new ArrayList<>(origen.getV_poblacion().get(i).getCromosoma()); //CONVERTIR EL HASHSET DEL CROMOSOMA DEL INDIVIDUO(i) POR UN ARRAYLIST Y PODER OBTENER LOS VALORES DE CADA GEN.
+            ArrayList<Integer> cromosoma_mutado = new ArrayList<>(origen.getV_poblacion().get(i).getCromosoma());
+            for(int j = 0; j < cromosoma.size(); j++){ //RECORRO GEN A GEN DEL CROMOSOMA
+                if (random.Randfloat(0, 1) < config.getPROB_GEN_MUTE()){ //PROB. DE QUE ESE GEN MUTE
+                    cromosoma_mutado.remove(cromosoma.get(j)); //EN EL CROMOSOMA MUTADO QUITAMOS EL CROMOSOMA QUE DEBE MUTAR DEL ARRAYLIST CROMOSOMA.
+                    do{
+                        cambiar = random.Randint(0, NUM_ELEMENTOS-1);
+                    }while (cromosoma_mutado.contains(cambiar)); //REPETIR SIEMPRE Y CUANDO EL NUEVO GEN MUTADO NO EXISTA YA EN EL CROMOSOMA.
+                    cromosoma_mutado.add(cambiar);
+                    //System.out.println("MUTACION : "+cromosoma.get(j)+" --> "+cambiar+" :: TAMAÑO DEL CROMOSOMA MUTADO = "+cromosoma_mutado.size());
+                    mutado = true; //CONTROLAR SI 1 GEN DEL CROMOSOMA HA SIDO MUTADO. ASÍ, SI UN CROMOSOMA NO HA MUTADO NI 1 GEN ENTONCES NO SE CUENTA LA EVALUACIÓN
+                }
+            }
+            /*SE HA COMPROBADO UN INDIVIDUO ENTERO, ENTONCES AHORA LO AÑADO A LA POBLACIÓN DESTINATARIA*/
+            if(mutado){
+                Individuo indiv = new Individuo(archivo, cromosoma_mutado);
+                evaluaciones++; //Ya que al haber mutado hay que volver a evaluar al individuo
+                mutado = false;
+                destinatario.getV_poblacion().add(indiv);
+            }
+            else
+                destinatario.getV_poblacion().add(origen.getV_poblacion().get(i)); //INDIVIDUO NO MUTADO, SIN HACER EVALUACIÓN DE SU FITNESS => SIN CONTAR EVALUACIÓN.
+            
+        }
+        //System.out.println(destinatario.getV_poblacion().size());
+        return destinatario;
+    }
     
     /*---- MÉTODO DE EVALUACIÓN ----*/
     
