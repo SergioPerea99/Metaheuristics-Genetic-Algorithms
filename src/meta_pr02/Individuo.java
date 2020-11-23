@@ -40,7 +40,7 @@ public final class Individuo {
             N.remove(_cromosoma.get(i));
         }
         /*COSTE INICIAL DEL INDIVIDUO*/
-        costeFitness();
+        //costeFitness();
     }
     
     public Individuo(Long sem,ArchivoDatos _archivo, Random random){

@@ -265,6 +265,7 @@ public class AlgGenetico_Generacional {
             /*SE HA COMPROBADO UN INDIVIDUO ENTERO, ENTONCES AHORA LO AÑADO A LA POBLACIÓN DESTINATARIA*/
             if(mutado){
                 Individuo indiv = new Individuo(archivo, cromosoma_mutado);
+                indiv.costeFitness();
                 evaluaciones++; //Ya que al haber mutado hay que volver a evaluar al individuo
                 mutado = false;
                 destinatario.getV_poblacion().add(indiv);
