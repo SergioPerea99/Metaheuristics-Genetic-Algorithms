@@ -35,7 +35,7 @@ public class Poblacion {
     public void mostrarPoblacion(){
         getV_poblacion().forEach((individuo) -> {
             System.out.println(individuo.getCromosoma());
-            System.out.println(individuo.getFitness());
+            System.out.println(individuo.getCromosoma().size()+" --> "+individuo.getFitness());
         });
     }
     

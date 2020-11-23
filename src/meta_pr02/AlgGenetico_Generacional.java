@@ -48,7 +48,11 @@ public class AlgGenetico_Generacional {
         
         
         nuevaPoblacion = cruce(nuevaPoblacion);
-        System.out.println(evaluaciones);
+        
+       
+        nuevaPoblacion.mostrarPoblacion();
+       
+        
         while (evaluaciones < config.getMAX_ITERACIONES()){
 //            torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO.
 //            nuevaPoblacion = cruce(nuevaPoblacion);
@@ -96,6 +100,7 @@ public class AlgGenetico_Generacional {
 
     }
     
+    /*APARENTEMENTE FUNCIONANDO*/
     private void cruce2puntos(Poblacion origen, Poblacion destinatario){
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){ //COMPRUEBO QUE ITERA O LA MITAD DE VECES DE UNA SOLUCIÓN O QUE ESTÉ COMPLETO EL DESTINATARIO
             if (random.Randfloat(0,1) < config.getPROB_CRUCE()){
@@ -151,9 +156,6 @@ public class AlgGenetico_Generacional {
                 destinatario.getV_poblacion().add(origen.getV_poblacion().get(i+1));
             }
         }
-//        for (int i = 0; i < config.getNUM_INDIVIDUOS(); i++)
-//            System.out.println(destinatario.getV_poblacion().get(i).getCromosoma().size());
-//        System.out.println(destinatario.getV_poblacion().size());
     }
     
     private void repara2puntos(Individuo ind){
@@ -172,6 +174,7 @@ public class AlgGenetico_Generacional {
         }
     }
     
+    /*NO FUNCIONA, DEVUELVE FITNESS POR INDIVIDUOS NO VÁLIDOS*/
     private void cruceMPX(Poblacion origen, Poblacion destinatario){
         /*Se obtiene 1 hijo a partir de 2 padres*/
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){
@@ -236,6 +239,7 @@ public class AlgGenetico_Generacional {
     }
     
     /*---- MÉTODO DE MUTACIÓN ----*/
+    
     
     
     /*---- MÉTODO DE EVALUACIÓN ----*/
