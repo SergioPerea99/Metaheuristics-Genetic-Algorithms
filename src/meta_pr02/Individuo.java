@@ -39,8 +39,6 @@ public final class Individuo {
             cromosoma.add(_cromosoma.get(i));
             N.remove(_cromosoma.get(i));
         }
-        /*COSTE INICIAL DEL INDIVIDUO*/
-        //costeFitness();
     }
     
     public Individuo(Long sem,ArchivoDatos _archivo, Random random){
@@ -73,12 +71,11 @@ public final class Individuo {
      * 
      * @brief Sumatoria del coste final.
      * @post La suma de todas las distancias de cada uno de los puntos con respecto a los demás puntos.
-     * @return Sumatoria final.
      */
     public void costeFitness(){
         fitness = 0.0;
         ArrayList<Integer> v_M = new ArrayList<>(cromosoma);
-        for(int i = 0; i < v_M.size()- 1; i++)
+        for(int i = 0; i < v_M.size()-1; i++)
             for(int j = i+1; j < v_M.size(); j++){
                 if(matrizDatos[v_M.get(i)][v_M.get(j)] != 0)
                     fitness += matrizDatos[v_M.get(i)][v_M.get(j)];
