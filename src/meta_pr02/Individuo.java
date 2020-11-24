@@ -41,7 +41,7 @@ public final class Individuo {
         }
     }
     
-    public Individuo(Long sem,ArchivoDatos _archivo, Random random){
+    public Individuo(ArchivoDatos _archivo, Random random){
         
         matrizDatos = _archivo.getMatrizDatos();
         num_elementos = _archivo.getTamMatriz();
@@ -62,9 +62,6 @@ public final class Individuo {
             N.remove(punto);
         }
         
-        /*COSTE INICIAL DEL INDIVIDUO*/
-        costeFitness();
-         
     }
     
     /**
@@ -94,7 +91,7 @@ public final class Individuo {
      * @return Suma de las distancias del elemento del parámetro con todos los candidatos.
      */
     protected double distanciasElemento(Integer elem){
-        double sumaDistancias = 0;
+        double sumaDistancias = 0.0;
         for(Integer i : cromosoma)
             if(matrizDatos[i][elem] != 0)
                 sumaDistancias += matrizDatos[i][elem];
@@ -103,28 +100,6 @@ public final class Individuo {
         return sumaDistancias;
     }
     
-    
-    /**
-     * @brief Método de intercambio de elementos.
-     * @post Se realiza el intercambio entre elementos indicados como parámetros
-     * para el HashSet de la solución, el ArrayList que simula a la solución Hashset.
-     * A la misma vez, se hace el intercambio inverso al HashSet de los elementos no seleccionados
-     * en la solución y en su ArrayList correspondiente.
-     * @param seleccionado
-     * @param j
-     * @param v_n
-     * @param v_M 
-     */
-    private void intercambiar(Integer seleccionado, Integer j,ArrayList<Integer> v_n, ArrayList<Integer> v_M){
-        v_M.remove(seleccionado);
-        v_M.add(j);
-        cromosoma.remove(seleccionado);
-        cromosoma.add(j);
-        v_n.remove(j);
-        v_n.add(seleccionado);
-        N.remove(j);
-        N.add(seleccionado);
-    }
     
     /**
      * @brief Ordenación respecto Aporte/Elemento.

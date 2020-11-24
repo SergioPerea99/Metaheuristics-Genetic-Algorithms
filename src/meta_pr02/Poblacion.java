@@ -27,7 +27,7 @@ public class Poblacion {
         v_poblacion = new ArrayList<>();
 
         while (v_poblacion.size() < num_individuos){
-            Individuo ind = new Individuo(_random.Get_random(),_archivo,_random);
+            Individuo ind = new Individuo(_archivo,_random);
             v_poblacion.add(ind);
         }
     }

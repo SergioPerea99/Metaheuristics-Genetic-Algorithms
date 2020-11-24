@@ -47,21 +47,14 @@ public class AlgGenetico_Generacional {
     
     public void ejecucionAGG(){
         
-        /*ESTRUCTURAS NECESARIAS A LO LARGO DEL PROCESO DEL ALGORITMO GENÉTICO GENERACIONAL*/
-        Poblacion nuevaPoblacion = new Poblacion(); //POBLACIÓN CON LA QUE REALIZAMOS EL PROCESO EVOLUTIVO.
-
+        evaluacion(poblacion);
         int iteraciones = 0;
         while (evaluaciones < config.getMAX_ITERACIONES()) {
-            /*PRUEBAS COMO SI FUESE UNA UNICA VEZ EL PROCESO.*/
-            torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO
-
+            Poblacion nuevaPoblacion = torneoBinario(); 
             Poblacion poblacion_cruzada = cruce(nuevaPoblacion);
-
             Poblacion poblacion_mutada = mutacion(poblacion_cruzada);
-
+            evaluacion(poblacion_cruzada);
             poblacion = reemplazo(config.getNUM_ELITE_INDIVIDUOS(), poblacion_mutada);
-            //poblacion.mostrarPoblacion();
-            //System.out.println(""); System.out.println("");
             System.out.println("MEJOR FITNESS ENCONTRADO --> " + MEJOR_FITNESS + " :: Nº EVALUACIONES = " + evaluaciones);
             iteraciones++;
         }
@@ -79,11 +72,12 @@ public class AlgGenetico_Generacional {
      * de individuos que debe tener una población.
      * @param p Población nueva a generarse.
      */
-    private void torneoBinario (Poblacion p){
+    private Poblacion torneoBinario (){
+        Poblacion p = new Poblacion();
         int pos;
         int i = 0;
         while (p.getV_poblacion().size() < config.getNUM_INDIVIDUOS()){
-            do{
+            do{ 
                 pos = random.Randint(0, config.getNUM_INDIVIDUOS()-1); //SEGUNDO INDIVIDUO A ENFRENTAR QUE NO SEA EL MISMO QUE EL PRIMERO.
             }while (i != pos);
             
@@ -93,6 +87,7 @@ public class AlgGenetico_Generacional {
                 p.getV_poblacion().add(poblacion.getV_poblacion().get(pos));
             i++;
         }
+        return p;
     }
     
     /*---- MÉTODOS DE CRUCE ----*/
@@ -117,7 +112,7 @@ public class AlgGenetico_Generacional {
             /*--- GENERAR 1 INDIVIDUO ALEATORIO DISTINTO AL DE LA ITERACIÓN ---*/
             int posIndiv;
             do {
-                posIndiv = random.Randint(0, config.getNUM_INDIVIDUOS() - 1);
+                posIndiv = random.Randint(0, origen.getV_poblacion().size() - 1);
             } while(posIndiv == i);
             /*-----------------------------------------------------------------*/
             
@@ -201,7 +196,7 @@ public class AlgGenetico_Generacional {
             /*--- GENERAR 1 INDIVIDUO ALEATORIO DISTINTO AL DE LA ITERACIÓN ---*/
             int posIndiv;
             do {
-                posIndiv = random.Randint(0, config.getNUM_INDIVIDUOS() - 1);
+                posIndiv = random.Randint(0, origen.getV_poblacion().size() - 1);
             } while(posIndiv == i);
             /*-----------------------------------------------------------------*/
             
@@ -241,14 +236,15 @@ public class AlgGenetico_Generacional {
         for(int k = 0; k < padre2.size(); k++)
             hijo.add(padre2.get(k));
         int numPadre1 = (int)(padre1.size()*config.getPORCENTAJE_MPX());
-        int p1 = (int)(padre1.size()/2) - 1;
-        int p2 = (int)(padre1.size()/2);
-        while(numPadre1 > 0){
-            hijo.add(padre1.get(p1));
-            hijo.add(padre1.get(p2));
-            --p1; ++p2;
-            numPadre1 -= 2;
-        }  
+        int p;
+        HashSet<Integer> probado = new HashSet<>();
+        for (int k = 0; k < numPadre1; k++){
+            do{
+                p = random.Randint(0, padre1.size()-1);
+            }while (probado.contains(p)); //EN CASO DE HABER PROBADO YA CON ESE ELEMENTO, SE REPITE EL ALEATORIO
+            probado.add(p);
+            hijo.add(padre1.get(p));
+        }
     }
     
     private void reparaMPX (Individuo ind){
@@ -300,13 +296,6 @@ public class AlgGenetico_Generacional {
     public Poblacion reemplazo(Integer k_elitismo, Poblacion p){
         Poblacion destinatario = new Poblacion();
         
-        /*--- CALCULAMOS EL NUEVO FITNESS DE LA POBLACIÓN ---*/
-        for(int i = 0; i < config.getNUM_INDIVIDUOS(); i++){ /*TODO: HACERLO SOLO PARA LOS QUE SE MODIFICAN*/
-            p.getV_poblacion().get(i).costeFitness();
-            evaluaciones++;
-        }
-        /*---------------------------------------------------*/
-        
         /*--- SE HACE REEMPLAZO (A PARTIR DE ELITE K) ---*/
         ArrayList<Pair<Individuo,Double>> antigua_ordenada = poblacion.ordenSegunFitness(); //ORDENO LA POBLACION P.
         ArrayList<Pair<Individuo,Double>> nueva_ordenada = p.ordenSegunFitness(); //ORDENO LA POBLACION P'
@@ -332,6 +321,16 @@ public class AlgGenetico_Generacional {
             }
         }
         return destinatario;
+    }
+    
+    /*MÉTODO DE EVALUACIÓN*/
+    
+    private void evaluacion(Poblacion p){
+        /*--- CALCULAMOS EL FITNESS DE LA POBLACIÓN ---*/
+        for(int i = 0; i < config.getNUM_INDIVIDUOS(); i++){ /*TODO: HACERLO SOLO PARA LOS QUE SE MODIFICAN*/
+            p.getV_poblacion().get(i).costeFitness();
+            evaluaciones++;
+        }
     }
    
 }
