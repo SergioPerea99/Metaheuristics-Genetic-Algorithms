@@ -45,10 +45,8 @@ public class AlgGenetico_Generacional {
     }
     
     
-    public void ejecucionAGG(){
-        
+    public void ejecucionAGG(){ 
         evaluacion(poblacion);
-        int iteraciones = 0;
         while (evaluaciones < config.getMAX_ITERACIONES()) {
             Poblacion nuevaPoblacion = torneoBinario(); 
             Poblacion poblacion_cruzada = cruce(nuevaPoblacion);
@@ -56,9 +54,10 @@ public class AlgGenetico_Generacional {
             evaluacion(poblacion_cruzada);
             poblacion = reemplazo(config.getNUM_ELITE_INDIVIDUOS(), poblacion_mutada);
             System.out.println("MEJOR FITNESS ENCONTRADO --> " + MEJOR_FITNESS + " :: Nº EVALUACIONES = " + evaluaciones);
-            iteraciones++;
         }
-        System.out.println(iteraciones);
+        
+        System.out.println(MEJOR_INDIVIDUO.getCromosoma());
+        System.out.println(MEJOR_FITNESS);
     }
         
     /*---- MÉTODOS PRIVADOS NECESARIOS PARA LA EJECUCIÓN DEL ALGORITMO ----*/
