@@ -19,11 +19,14 @@ public class AlgGenetico_Generacional {
     private final ArchivoDatos archivo;
     private final Random random;
     
+    private Individuo MEJOR_INDIVIDUO;
+    private Double MEJOR_FITNESS;
     
     private final int NUM_ELEMENTOS; //Tamaño completo de elementos que pueden ser o no parte de la Solución.
     private final int NUM_CANDIDATOS; //Tamaño que debe de ocupar el conjunto de elementos de la solución.
     private Poblacion poblacion;
     private int evaluaciones;
+    
     
     public AlgGenetico_Generacional(String[] _args,Integer num_archivo, Integer sem){
         config = new Configurador(_args[0]);
@@ -34,33 +37,37 @@ public class AlgGenetico_Generacional {
         NUM_CANDIDATOS = archivo.getTamSolucion();
         evaluaciones = 0;
         
-        poblacion = new Poblacion(random,NUM_CANDIDATOS, archivo);//TODO: CREAR PARAMETRO CONFIGURABLE DEL NÚMERO DE INDIVIDUOS DE LA
+        poblacion = new Poblacion(random,config.getNUM_INDIVIDUOS(), archivo);
+        ArrayList<Integer> individuo_mejor = new ArrayList<>(archivo.getTamSolucion());
+        MEJOR_INDIVIDUO = new Individuo(archivo, individuo_mejor);
+        MEJOR_INDIVIDUO.costeFitness();
+        MEJOR_FITNESS = MEJOR_INDIVIDUO.getFitness();
     }
     
     
     public void ejecucionAGG(){
         
-        /*ESTRUCTURAS NECESARIAS A LO LARGO DEL PROCESO DEL ALGORITMO GENÉTICO GENERACIONAL*/
-        Poblacion nuevaPoblacion = new Poblacion(); //POBLACIÓN CON LA QUE REALIZAMOS EL PROCESO EVOLUTIVO.
-        
-        /*PRUEBAS COMO SI FUESE UNA UNICA VEZ EL PROCESO.*/
+       /*ESTRUCTURAS NECESARIAS A LO LARGO DEL PROCESO DEL ALGORITMO GENÉTICO GENERACIONAL*/
+       Poblacion nuevaPoblacion = new Poblacion(); //POBLACIÓN CON LA QUE REALIZAMOS EL PROCESO EVOLUTIVO.
        
-       torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO
-       
-       Poblacion poblacion_cruzada = cruce(nuevaPoblacion);
-       //System.out.println(evaluaciones);
-       //poblacion_cruzada.mostrarPoblacion();
-       
-       Poblacion poblacion_mutada = mutacion(poblacion_cruzada);
-       //System.out.println(evaluaciones);
-       poblacion_mutada.mostrarPoblacion();
-       
-       
-        while (evaluaciones < config.getMAX_ITERACIONES()){
-//            torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO.
-//            nuevaPoblacion = cruce(nuevaPoblacion);
-            evaluaciones++;
+       int iteraciones = 0;
+       poblacion.mostrarPoblacion();
+        System.out.println("");
+        while (evaluaciones < config.getMAX_ITERACIONES()) {
+            /*PRUEBAS COMO SI FUESE UNA UNICA VEZ EL PROCESO.*/
+            torneoBinario(nuevaPoblacion); //FUNCIONA CORRECTAMENTE. COMPROBADO
+
+            Poblacion poblacion_cruzada = cruce(nuevaPoblacion);
+
+            Poblacion poblacion_mutada = mutacion(poblacion_cruzada);
+
+            poblacion = reemplazo(config.getNUM_ELITE_INDIVIDUOS(), poblacion_mutada);
+            poblacion.mostrarPoblacion();
+            System.out.println(""); System.out.println("");
+            //System.out.println("MEJOR FITNESS ENCONTRADO --> "+MEJOR_FITNESS+" :: Nº EVALUACIONES = "+evaluaciones);
+            iteraciones++;
         }
+        System.out.println(iteraciones);
     }
         
     /*---- MÉTODOS PRIVADOS NECESARIOS PARA LA EJECUCIÓN DEL ALGORITMO ----*/
@@ -74,17 +81,18 @@ public class AlgGenetico_Generacional {
      * @param p Población nueva a generarse.
      */
     private void torneoBinario (Poblacion p){
-        int pos1,pos2;
-        while (p.getV_poblacion().size() < NUM_CANDIDATOS){
+        int pos;
+        int i = 0;
+        while (p.getV_poblacion().size() < config.getNUM_INDIVIDUOS()){
             do{
-                pos1 = random.Randint(0, NUM_CANDIDATOS-1);
-                pos2 = random.Randint(0, NUM_CANDIDATOS-1); //SEGUNDO INDIVIDUO A ENFRENTAR QUE NO SEA EL MISMO QUE EL PRIMERO.
-            }while (pos1 != pos2);
+                pos = random.Randint(0, config.getNUM_INDIVIDUOS()-1); //SEGUNDO INDIVIDUO A ENFRENTAR QUE NO SEA EL MISMO QUE EL PRIMERO.
+            }while (i != pos);
             
-            if(poblacion.getV_poblacion().get(pos1).getFitness() >= poblacion.getV_poblacion().get(pos2).getFitness())
-                p.getV_poblacion().add(poblacion.getV_poblacion().get(pos1));
+            if(poblacion.getV_poblacion().get(i).getFitness() >= poblacion.getV_poblacion().get(pos).getFitness())
+                p.getV_poblacion().add(poblacion.getV_poblacion().get(i));
             else
-                p.getV_poblacion().add(poblacion.getV_poblacion().get(pos2));
+                p.getV_poblacion().add(poblacion.getV_poblacion().get(pos));
+            i++;
         }
     }
     
@@ -103,7 +111,7 @@ public class AlgGenetico_Generacional {
 
     }
     
-    /*APARENTEMENTE FUNCIONANDO*/
+        /*APARENTEMENTE FUNCIONANDO*/
     private void cruce2puntos(Poblacion origen, Poblacion destinatario){
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){ //COMPRUEBO QUE ITERA O LA MITAD DE VECES DE UNA SOLUCIÓN O QUE ESTÉ COMPLETO EL DESTINATARIO
             if (random.Randfloat(0,1) < config.getPROB_CRUCE()){
@@ -145,11 +153,7 @@ public class AlgGenetico_Generacional {
                     repara2puntos(individuoHijo2);
                 
                 /*UNA VEZ TENEMOS LOS 2 INDIVIDUOS HIJOS CRUZADOS (Y REPARADOS EN CASO DE TENER QUE HACERLO) ENTONCES SE AÑADEN A LA POBLACIÓN*/
-                individuoHijo1.costeFitness();
-                evaluaciones++;
                 destinatario.getV_poblacion().add(individuoHijo1);
-                individuoHijo2.costeFitness();
-                evaluaciones++;
                 destinatario.getV_poblacion().add(individuoHijo2);
                 
             }
@@ -177,7 +181,7 @@ public class AlgGenetico_Generacional {
         }
     }
     
-    /*APARENTEMENTE FUNCIONANDO*/
+        /*APARENTEMENTE FUNCIONANDO*/
     private void cruceMPX(Poblacion origen, Poblacion destinatario){
         /*Se obtiene 1 hijo a partir de 2 padres*/
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){
@@ -200,13 +204,7 @@ public class AlgGenetico_Generacional {
 
                 
                 /*UNA VEZ TENEMOS LOS 2 INDIVIDUOS HIJOS CRUZADOS (Y REPARADOS EN CASO DE TENER QUE HACERLO) ENTONCES SE AÑADEN A LA POBLACIÓN*/
-                ind1.costeFitness();
-                //System.out.println(ind1.getCromosoma().size()+" --> "+ind1.getFitness());
-                evaluaciones++;
                 destinatario.getV_poblacion().add(ind1);
-                ind2.costeFitness();
-                //System.out.println(ind2.getCromosoma().size()+" --> "+ind2.getFitness());
-                evaluaciones++;
                 destinatario.getV_poblacion().add(ind2);
 
             }
@@ -242,8 +240,7 @@ public class AlgGenetico_Generacional {
     }
     
     /*---- MÉTODO DE MUTACIÓN ----*/
-    
-    /*APARENTEMENTE FUNCIONANDO*/
+        /*APARENTEMENTE FUNCIONANDO*/
     private Poblacion mutacion(Poblacion origen){
         Poblacion destinatario = new Poblacion();
         int cambiar;
@@ -265,8 +262,6 @@ public class AlgGenetico_Generacional {
             /*SE HA COMPROBADO UN INDIVIDUO ENTERO, ENTONCES AHORA LO AÑADO A LA POBLACIÓN DESTINATARIA*/
             if(mutado){
                 Individuo indiv = new Individuo(archivo, cromosoma_mutado);
-                indiv.costeFitness();
-                evaluaciones++; //Ya que al haber mutado hay que volver a evaluar al individuo
                 mutado = false;
                 destinatario.getV_poblacion().add(indiv);
             }
@@ -278,10 +273,58 @@ public class AlgGenetico_Generacional {
         return destinatario;
     }
     
-    /*---- MÉTODO DE EVALUACIÓN ----*/
-    
     
     /*---- MÉTODO DE REEMPLAZO ----*/
-    
+    public Poblacion reemplazo(Integer k_elitismo, Poblacion p){
+        Poblacion destinatario = new Poblacion();
+        
+        for(int i = 0; i < config.getNUM_INDIVIDUOS(); i++){ /*CALCULAMOS EL NUEVO COSTE FITNESS DE LA POBLACIÓN QUE REEMPLAZA*/
+            p.getV_poblacion().get(i).costeFitness();
+            evaluaciones++;
+        }
+        
+        ArrayList<Pair<Individuo,Double>> antigua_ordenada = poblacion.ordenSegunFitness();
+        ArrayList<Pair<Individuo,Double>> nueva_ordenada = p.ordenSegunFitness();
+        int mayorAporte = antigua_ordenada.size()-1; //Posición del individuo de mayor aporte.
+        
+        for(int i = 0; i < k_elitismo; i++){
+            destinatario.getV_poblacion().add(antigua_ordenada.get(mayorAporte).getKey());
+            if (antigua_ordenada.get(mayorAporte).getValue() > MEJOR_FITNESS){
+                    MEJOR_INDIVIDUO = antigua_ordenada.get(mayorAporte).getKey();
+                    MEJOR_FITNESS = antigua_ordenada.get(mayorAporte).getValue();
+            }
+            mayorAporte--;
+        }
+        for(int i = nueva_ordenada.size()-1; i >= k_elitismo; i--){
+            destinatario.getV_poblacion().add(nueva_ordenada.get(i).getKey());
+            if (nueva_ordenada.get(i).getValue() > MEJOR_FITNESS){
+                    MEJOR_INDIVIDUO = nueva_ordenada.get(i).getKey();
+                    MEJOR_FITNESS = nueva_ordenada.get(i).getValue();
+            }
+        }
+        
+//        for(int i = 0; i < config.getNUM_INDIVIDUOS(); i++){
+//            if (i < k_elitismo){
+//                destinatario.getV_poblacion().add(antigua_ordenada.get(mayorAporte).getKey());
+//                
+//                if (antigua_ordenada.get(mayorAporte).getValue() > MEJOR_FITNESS){
+//                    MEJOR_INDIVIDUO = antigua_ordenada.get(mayorAporte).getKey();
+//                    MEJOR_FITNESS = antigua_ordenada.get(mayorAporte).getValue();
+//                }
+//                
+//                mayorAporte--;
+//            }else{
+//                destinatario.getV_poblacion().add(nueva_ordenada.get(i).getKey());
+//                
+//                if (nueva_ordenada.get(i).getValue() > MEJOR_FITNESS){
+//                    MEJOR_INDIVIDUO = nueva_ordenada.get(i).getKey();
+//                    MEJOR_FITNESS = nueva_ordenada.get(i).getValue();
+//                }
+//                
+//            }
+//        }
+        //System.out.println(destinatario.getV_poblacion().size());
+        return destinatario;
+    }
    
 }
