@@ -1,9 +1,9 @@
 Archivos=GKD-c_1_n500_m50.txt GKD-c_2_n500_m50.txt GKD-c_3_n500_m50.txt SOM-b_11_n300_m90.txt SOM-b_12_n300_m120.txt SOM-b_13_n400_m40.txt MDG-a_21_n2000_m200.txt MDG-a_22_n2000_m200.txt MDG-a_23_n2000_m200.txt
-Num_Elite_Individuos=3
+Num_Elite_Individuos=2
 Semillas=77433569
 MaximoIteraciones=50000
 Num_Individuos=50
 Prob_Cruce=0.7
 Prob_Gen_Mutacion=0.05
-Tipo_Cruce=2puntos
+Tipo_Cruce=MPX
 Porcentaje_MPX=0.8

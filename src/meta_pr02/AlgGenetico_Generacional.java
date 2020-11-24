@@ -55,11 +55,9 @@ public class AlgGenetico_Generacional {
             poblacion = reemplazo(config.getNUM_ELITE_INDIVIDUOS(), poblacion_mutada);
             System.out.println("MEJOR FITNESS ENCONTRADO --> " + MEJOR_FITNESS + " :: Nº EVALUACIONES = " + evaluaciones);
         }
-        
-        System.out.println(MEJOR_INDIVIDUO.getCromosoma());
-        System.out.println(MEJOR_FITNESS);
     }
         
+    
     /*---- MÉTODOS PRIVADOS NECESARIOS PARA LA EJECUCIÓN DEL ALGORITMO ----*/
     
     /*---- MÉTODO DE SELECCIÓN ----*/
@@ -73,10 +71,10 @@ public class AlgGenetico_Generacional {
      */
     private Poblacion torneoBinario (){
         Poblacion p = new Poblacion();
-        int pos;
-        int i = 0;
+        int pos,i;
         while (p.getV_poblacion().size() < config.getNUM_INDIVIDUOS()){
             do{ 
+                i = random.Randint(0, config.getNUM_INDIVIDUOS()-1);
                 pos = random.Randint(0, config.getNUM_INDIVIDUOS()-1); //SEGUNDO INDIVIDUO A ENFRENTAR QUE NO SEA EL MISMO QUE EL PRIMERO.
             }while (i != pos);
             
@@ -84,7 +82,6 @@ public class AlgGenetico_Generacional {
                 p.getV_poblacion().add(poblacion.getV_poblacion().get(i));
             else
                 p.getV_poblacion().add(poblacion.getV_poblacion().get(pos));
-            i++;
         }
         return p;
     }
@@ -103,17 +100,11 @@ public class AlgGenetico_Generacional {
 
     }
     
-        /*APARENTEMENTE FUNCIONANDO*/
+       
+    //TODO: DEVOLVER UN LIST DE LOS HIJOS Y COMO PARAMETROS LOS PADRES A CRUZAR. PARA EVITAR DUPLICAR CODIGO
     private void cruce2puntos(Poblacion origen, Poblacion destinatario){
         
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){ //COMPRUEBO QUE ITERA O LA MITAD DE VECES DE UNA SOLUCIÓN O QUE ESTÉ COMPLETO EL DESTINATARIO
-            
-            /*--- GENERAR 1 INDIVIDUO ALEATORIO DISTINTO AL DE LA ITERACIÓN ---*/
-            int posIndiv;
-            do {
-                posIndiv = random.Randint(0, origen.getV_poblacion().size() - 1);
-            } while(posIndiv == i);
-            /*-----------------------------------------------------------------*/
             
             if (random.Randfloat(0,1) < config.getPROB_CRUCE()){
                 
@@ -132,9 +123,10 @@ public class AlgGenetico_Generacional {
                 
                 /*--- REALIZAR EL CRUCE EN LOS CROMOSOMAS HIJOS ---*/
                 ArrayList<Integer> padre1 = new ArrayList<>(origen.getV_poblacion().get(i).getCromosoma()); /*Añadimos en los individuos hijos los padres cruzados*/
-                ArrayList<Integer> padre2 = new ArrayList<>(origen.getV_poblacion().get(posIndiv).getCromosoma());/*Añadimos en los individuos hijos los padres cruzados*/
+                ArrayList<Integer> padre2 = new ArrayList<>(origen.getV_poblacion().get(i+1).getCromosoma());/*Añadimos en los individuos hijos los padres cruzados*/
                 HashSet<Integer> hijo1 = new HashSet<>();
                 HashSet<Integer> hijo2 = new HashSet<>();
+                
                 for(int j = 0; j < padre1.size() ; j++){ //Recorro los cromosomas de los individuos padres
                     if(j < punto1 || j > punto2){ //ANTES DE CRUZAR, SE COPIA EN EL HIJO LOS GENES SIN CRUZAR DEL CROMOSOMA PADRE.
                         hijo1.add(padre1.get(j));
@@ -165,7 +157,7 @@ public class AlgGenetico_Generacional {
             /*En caos de no tener que cruzarse por probabilidad, se copian los padres al destinatario*/
             else{
                 destinatario.getV_poblacion().add(origen.getV_poblacion().get(i));
-                destinatario.getV_poblacion().add(origen.getV_poblacion().get(posIndiv));
+                destinatario.getV_poblacion().add(origen.getV_poblacion().get(i+1));
             }
         }
     }
@@ -187,25 +179,18 @@ public class AlgGenetico_Generacional {
         }
     }
     
-        /*APARENTEMENTE FUNCIONANDO*/
+        
     private void cruceMPX(Poblacion origen, Poblacion destinatario){
         
         for(int i = 0; i < origen.getV_poblacion().size(); i += 2){
-            
-            /*--- GENERAR 1 INDIVIDUO ALEATORIO DISTINTO AL DE LA ITERACIÓN ---*/
-            int posIndiv;
-            do {
-                posIndiv = random.Randint(0, origen.getV_poblacion().size() - 1);
-            } while(posIndiv == i);
-            /*-----------------------------------------------------------------*/
             
             if (random.Randfloat(0,1) < config.getPROB_CRUCE()){
                 
                 /*--- HACEMOS EL PROCESO DE CRUCE MPX 2 VECES ---*/
                 HashSet<Integer> hijo1 = new HashSet<>();
                 HashSet<Integer> hijo2 = new HashSet<>();
-                hijoMPX(origen.getV_poblacion().get(i),origen.getV_poblacion().get(posIndiv),hijo1);
-                hijoMPX(origen.getV_poblacion().get(posIndiv),origen.getV_poblacion().get(i),hijo2);
+                hijoMPX(origen.getV_poblacion().get(i),origen.getV_poblacion().get(i+1),hijo1);
+                hijoMPX(origen.getV_poblacion().get(i+1),origen.getV_poblacion().get(i),hijo2);
                 /*----------------------------------------------*/
                 
                 /*--- COMPROBAMOS QUE NO HAYA QUE REPARAR A LOS HIJOS GENERADOS ---*/
@@ -224,7 +209,7 @@ public class AlgGenetico_Generacional {
             }
             else{
                 destinatario.getV_poblacion().add(origen.getV_poblacion().get(i));
-                destinatario.getV_poblacion().add(origen.getV_poblacion().get(posIndiv));
+                destinatario.getV_poblacion().add(origen.getV_poblacion().get(i+1));
             }
         }
     }
