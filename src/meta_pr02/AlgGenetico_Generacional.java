@@ -14,6 +14,7 @@ import javafx.util.Pair;
  * @author spdlc
  */
 public class AlgGenetico_Generacional {
+    
     /*ATRIBUTOS PARA LA CARGA DE FICHEROS*/
     private final Configurador config;
     private final ArchivoDatos archivo;
@@ -28,9 +29,9 @@ public class AlgGenetico_Generacional {
     private int evaluaciones;
     
     
-    public AlgGenetico_Generacional(String[] _args,Integer num_archivo, Integer sem){
+    public AlgGenetico_Generacional(String[] _args,ArchivoDatos _archivo, Integer sem){
         config = new Configurador(_args[0]);
-        archivo = new ArchivoDatos(config.getArchivos().get(num_archivo));
+        archivo = _archivo;
         random = new Random(config.getSemillas().get(sem));
 
         NUM_ELEMENTOS = archivo.getTamMatriz();
@@ -38,9 +39,9 @@ public class AlgGenetico_Generacional {
         evaluaciones = 0;
         
         poblacion = new Poblacion(random,config.getNUM_INDIVIDUOS(), archivo);
-        ArrayList<Integer> individuo_mejor = new ArrayList<>(archivo.getTamSolucion());
-        MEJOR_INDIVIDUO = new Individuo(archivo, individuo_mejor);
-        MEJOR_INDIVIDUO.costeFitness();
+        evaluacion(poblacion);
+        ArrayList<Pair<Individuo,Double>> par = poblacion.ordenSegunFitness();
+        MEJOR_INDIVIDUO = par.get(par.size()-1).getKey();
         MEJOR_FITNESS = MEJOR_INDIVIDUO.getFitness();
     }
     
@@ -53,7 +54,6 @@ public class AlgGenetico_Generacional {
             Poblacion poblacion_mutada = mutacion(poblacion_cruzada);
             evaluacion(poblacion_cruzada);
             poblacion = reemplazo(config.getNUM_ELITE_INDIVIDUOS(), poblacion_mutada);
-            System.out.println("MEJOR FITNESS ENCONTRADO --> " + MEJOR_FITNESS + " :: Nº EVALUACIONES = " + evaluaciones);
         }
     }
         
@@ -290,7 +290,7 @@ public class AlgGenetico_Generacional {
             if (i < k_elitismo) {
                 destinatario.getV_poblacion().add(i, antigua_ordenada.get(mayorAporte).getKey());
 
-                if (antigua_ordenada.get(mayorAporte).getValue() > MEJOR_FITNESS) {
+                if (antigua_ordenada.get(mayorAporte).getValue() > getMEJOR_FITNESS()) {
                     MEJOR_INDIVIDUO = antigua_ordenada.get(mayorAporte).getKey();
                     MEJOR_FITNESS = antigua_ordenada.get(mayorAporte).getValue();
                 }
@@ -299,7 +299,7 @@ public class AlgGenetico_Generacional {
             } else {
                 destinatario.getV_poblacion().add(i, nueva_ordenada.get(i).getKey());
 
-                if (nueva_ordenada.get(i).getValue() > MEJOR_FITNESS) {
+                if (nueva_ordenada.get(i).getValue() > getMEJOR_FITNESS()) {
                     MEJOR_INDIVIDUO = nueva_ordenada.get(i).getKey();
                     MEJOR_FITNESS = nueva_ordenada.get(i).getValue();
                 }
@@ -318,5 +318,20 @@ public class AlgGenetico_Generacional {
             evaluaciones++;
         }
     }
+
+    /**
+     * @return the MEJOR_INDIVIDUO
+     */
+    public Individuo getMEJOR_INDIVIDUO() {
+        return MEJOR_INDIVIDUO;
+    }
+
+    /**
+     * @return the MEJOR_FITNESS
+     */
+    public Double getMEJOR_FITNESS() {
+        return MEJOR_FITNESS;
+    }
    
+    
 }
