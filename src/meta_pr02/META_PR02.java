@@ -26,8 +26,6 @@ public class META_PR02 {
      */
     public static void main(String[] args) {
         
-        
-        
         Configurador config = new Configurador(args[0]);
         System.out.println(config.getArchivos());
         ArrayList<ArchivoDatos> archivos = new ArrayList<>();

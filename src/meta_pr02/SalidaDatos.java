@@ -36,7 +36,7 @@ public class SalidaDatos implements Runnable {
         ArrayList<Integer> v_M;
 
                 
-        log.append("ALGORITMO GENÉTICO GENERACIONAL (CRUCE EN MPX Y ÉLITE 3) :: ARCHIVO "+archivo.getNombre()+" :: Nº_SEMILLA = "+semilla+".\n\n");
+        log.append("ALGORITMO GENÉTICO GENERACIONAL (CRUCE EN 2 PUNTOS Y ÉLITE 10) :: ARCHIVO "+archivo.getNombre()+" :: Nº_SEMILLA = "+semilla+".\n\n");
         AlgGenetico_Generacional AGG = new AlgGenetico_Generacional(args,archivo, semilla);
         log.append("ELEMENTO INICIAL DE PARTIDA:\n"+AGG.getMEJOR_INDIVIDUO().getCromosoma()+"\nCOSTE INICIAL: "+AGG.getMEJOR_FITNESS()+"\n\n");
 
