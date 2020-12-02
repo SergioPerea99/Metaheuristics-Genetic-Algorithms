@@ -176,7 +176,7 @@ public class AlgGenetico_Generacional {
             double distMax = 0.0;
             int elem_seleccionado = -1;
             for (Integer j : ind.getN()){
-                double aux = ind.distanciasElemento(j);
+                double aux = ind.distanciasElemento(j,archivo.getMatrizDatos());
                 if(distMax < aux){
                     distMax = aux;
                     elem_seleccionado = j;
@@ -234,7 +234,7 @@ public class AlgGenetico_Generacional {
     
     private void reparaMPX (Individuo ind){
         ArrayList<Pair<Integer,Double>> v_aportes = new ArrayList<>();
-        ind.ordenacionMenorAporte(v_aportes);
+        ind.ordenacionMenorAporte(v_aportes,archivo.getMatrizDatos());
         int num_borrar = ind.getCromosoma().size() - archivo.getTamSolucion();
         for(int i = 0; i < num_borrar; i++) /*Bucle de eliminar todos los sobrantes de menor aporte*/
             ind.getCromosoma().remove(v_aportes.get(i).getKey());
@@ -314,7 +314,7 @@ public class AlgGenetico_Generacional {
     private void evaluacion(Poblacion p){
         /*--- CALCULAMOS EL FITNESS DE CADA INDIVIDUO DE LA POBLACIÓN ---*/
         for(int i = 0; i < config.getNUM_INDIVIDUOS(); i++){ /*TODO: HACERLO SOLO PARA LOS QUE SE MODIFICAN*/
-            p.getV_poblacion().get(i).costeFitness();
+            p.getV_poblacion().get(i).costeFitness(archivo.getMatrizDatos());
             evaluaciones++;
         }
     }
