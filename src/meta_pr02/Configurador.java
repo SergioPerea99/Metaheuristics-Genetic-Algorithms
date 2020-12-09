@@ -15,18 +15,17 @@ import java.util.ArrayList;
  */
 public class Configurador {
     private ArrayList<String> archivos;
-    private ArrayList<String> algoritmos; //Para la elección de ejecución de los algoritmos a usar.
     private ArrayList<Long> semillas; //Para las diferentes semillas usadas.
     private Integer MAX_ITERACIONES;
-    private Integer INTENTOS_REINICIO;
-    private Double REDUCCION_VECINDARIO;
-    private Integer TENENCIA_TABU;
-    private Double PROB_INTENSIFICAR_DIVERSIFICAR;
-    private Integer MIN_VECINOS;
+    private Integer NUM_INDIVIDUOS;
+    private Integer NUM_ELITE_INDIVIDUOS;
+    private String TIPO_CRUCE;
+    private Float PROB_CRUCE;
+    private Float PROB_GEN_MUTE;
+    private Float PORCENTAJE_MPX;
     
     public Configurador(String ruta){
         archivos = new ArrayList<>();
-        algoritmos = new ArrayList<>();
         semillas = new ArrayList<>();
         
         String linea;
@@ -38,23 +37,11 @@ public class Configurador {
                 String[] split = linea.split("="); //Dividimos la línea por iguales.
                 switch(split[0]){
                     case "Archivos":
-                        //Si únicamente utilizamos un único archivo sería: archivos.add(split[1]);
-                        //Como utilizaremos varios, e igual con las semillas, entonces:
-                        //Si en el txt se encuentra cada archivo separado por espacios...
                         String[] vArchivos = split[1].split(" "); //Volvemos a dividir por espacios.
-                        
-                        //Añadimos todos los archivos al vector de archivos.
                         for (int i = 0; i < vArchivos.length; i++)
                             archivos.add(vArchivos[i]);
-                        
                         break;
-                        
-                    case "Algoritmos":
-                        String[] vAlgoritmos = split[1].split(" "); //Volvemos a dividir por espacios.
-                        for (int i = 0; i < vAlgoritmos.length; i++)
-                            algoritmos.add(vAlgoritmos[i]);
-                        break;
-                        
+                      
                     case "Semillas":
                         String[] vSemillas = split[1].split(" "); //Volvemos a dividir por espacios.
                         for (int i = 0; i < vSemillas.length; i++)
@@ -65,26 +52,24 @@ public class Configurador {
                         MAX_ITERACIONES = Integer.parseInt(split[1]);
                         break;
                         
-                    case "Intentos_Reinicio":
-                        INTENTOS_REINICIO = Integer.parseInt(split[1]);
+                    case "Num_Individuos":
+                        NUM_INDIVIDUOS = Integer.parseInt(split[1]);
                         break;
-                        
-                    case "Prob_Reduccion_Vecindario":
-                        REDUCCION_VECINDARIO = Double.parseDouble(split[1]);
+                    case "Num_Elite_Individuos":
+                        NUM_ELITE_INDIVIDUOS = Integer.parseInt(split[1]);
                         break;
-                        
-                    case "Minimo_Vecinos":
-                        MIN_VECINOS = Integer.parseInt(split[1]);
+                    case "Tipo_Cruce":
+                        TIPO_CRUCE = split[1];
                         break;
-                        
-                    case "tenencia_tabu":
-                        TENENCIA_TABU = Integer.parseInt(split[1]);
+                    case "Prob_Cruce":
+                        PROB_CRUCE = Float.parseFloat(split[1]);
                         break;
-                        
-                    case "Prob_Intensificar_Diversificar":
-                        PROB_INTENSIFICAR_DIVERSIFICAR = Double.parseDouble(split[1]);
+                    case "Prob_Gen_Mutacion":
+                        PROB_GEN_MUTE = Float.parseFloat(split[1]);
                         break;
-                        
+                    case "Porcentaje_MPX":
+                        PORCENTAJE_MPX = Float.parseFloat(split[1]);
+                        break;
                     default:
                         break;
                     
@@ -107,24 +92,10 @@ public class Configurador {
     }
 
     /**
-     * @return the algoritmos
-     */
-    public ArrayList<String> getAlgoritmos() {
-        return algoritmos;
-    }
-
-    /**
      * @return the semillas
      */
     public ArrayList<Long> getSemillas() {
         return semillas;
-    }
-
-    /**
-     * @return the parametroExtra
-     */
-    public Integer getMax_Iteraciones() {
-        return getMAX_ITERACIONES();
     }
 
     /**
@@ -133,40 +104,12 @@ public class Configurador {
     public void setArchivos(ArrayList<String> archivos) {
         this.archivos = archivos;
     }
-
-    /**
-     * @param algoritmos the algoritmos to set
-     */
-    public void setAlgoritmos(ArrayList<String> algoritmos) {
-        this.algoritmos = algoritmos;
-    }
-
+    
     /**
      * @param semillas the semillas to set
      */
     public void setSemillas(ArrayList<Long> semillas) {
         this.semillas = semillas;
-    }
-
-    /**
-     * @param _maxIteraciones  the parametroExtra to set
-     */
-    public void setMaxIteraciones(Integer _maxIteraciones) {
-        this.MAX_ITERACIONES = _maxIteraciones;
-    }
-
-    /**
-     * @return the INTENTOS_REINICIO
-     */
-    public Integer getINTENTOS_REINICIO() {
-        return INTENTOS_REINICIO;
-    }
-
-    /**
-     * @return the REDUCCION_VECINDARIO
-     */
-    public double getREDUCCION_VECINDARIO() {
-        return REDUCCION_VECINDARIO;
     }
 
     /**
@@ -177,30 +120,47 @@ public class Configurador {
     }
 
     /**
-     * @return the TENENCIA_TABU
+     * @return the NUM_INDIVIDUOS
      */
-    public Integer getTENENCIA_TABU() {
-        return TENENCIA_TABU;
+    public Integer getNUM_INDIVIDUOS() {
+        return NUM_INDIVIDUOS;
     }
 
     /**
-     * @return the PROB_INTENSIFICAR_DIVERSIFICAR
+     * @return the NUM_ELITE_INDIVIDUOS
      */
-    public double getPROB_INTENSIFICAR_DIVERSIFICAR() {
-        return PROB_INTENSIFICAR_DIVERSIFICAR;
+    public Integer getNUM_ELITE_INDIVIDUOS() {
+        return NUM_ELITE_INDIVIDUOS;
     }
 
     /**
-     * @param PROB_INTENSIFICAR_DIVERSIFICAR the PROB_INTENSIFICAR_DIVERSIFICAR to set
+     * @return the TIPO_CRUCE
      */
-    public void setPROB_INTENSIFICAR_DIVERSIFICAR(double PROB_INTENSIFICAR_DIVERSIFICAR) {
-        this.PROB_INTENSIFICAR_DIVERSIFICAR = PROB_INTENSIFICAR_DIVERSIFICAR;
+    public String getTIPO_CRUCE() {
+        return TIPO_CRUCE;
     }
 
     /**
-     * @return the MIN_VECINOS
+     * @return the PROB_CRUCE
      */
-    public Integer getMIN_VECINOS() {
-        return MIN_VECINOS;
+    public Float getPROB_CRUCE() {
+        return PROB_CRUCE;
     }
+
+    /**
+     * @return the PROB_GEN_MUTE
+     */
+    public Float getPROB_GEN_MUTE() {
+        return PROB_GEN_MUTE;
+    }
+
+    /**
+     * @return the PORCENTAJE_MPX
+     */
+    public Float getPORCENTAJE_MPX() {
+        return PORCENTAJE_MPX;
+    }
+    
+    
+    
 }
